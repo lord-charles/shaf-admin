@@ -24,8 +24,11 @@ const data = [
 export function DelegatesByCountryChart() {
   const [sortBy, setSortBy] = useState<"value" | "name">("value")
 
+  // Defensive: ensure data is always array
+  const safeData = Array.isArray(data) ? data : [];
+
   // Sort data based on sortBy state
-  const sortedData = [...data].sort((a, b) => {
+  const sortedData = [...safeData].sort((a, b) => {
     if (sortBy === "value") {
       return b.value - a.value
     } else {
@@ -36,6 +39,20 @@ export function DelegatesByCountryChart() {
   const toggleSort = () => {
     setSortBy(sortBy === "value" ? "name" : "value")
   }
+
+  // Custom Tooltip component for Recharts
+  const CustomTooltip = ({ active, payload }: any) => {
+    if (active && payload && payload.length > 0 && payload[0] && payload[0].payload) {
+      const data = payload[0].payload;
+      return (
+        <ChartTooltipContent
+          className="w-[150px]"
+          title={data.name || ""}
+        />
+      );
+    }
+    return null;
+  };
 
   return (
     <Card className="col-span-full lg:col-span-4">
@@ -57,11 +74,11 @@ export function DelegatesByCountryChart() {
       <CardContent>
         <div className="flex flex-col md:flex-row">
           <div className="w-full md:w-1/2">
-            <ChartContainer className="aspect-square w-full">
+            <ChartContainer config={{}} className="aspect-square w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   <Pie
-                    data={sortedData}
+                    data={safeData}
                     cx="50%"
                     cy="50%"
                     labelLine={false}
@@ -72,30 +89,11 @@ export function DelegatesByCountryChart() {
                     animationDuration={1000}
                     animationBegin={200}
                   >
-                    {sortedData.map((entry, index) => (
+                    {safeData.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={entry.color} />
                     ))}
                   </Pie>
-                  <Tooltip
-                    content={({ active, payload }) => {
-                      if (active && payload && payload.length > 0 && payload[0] && payload[0].payload) {
-                        const data = payload[0].payload
-                        return (
-                          <ChartTooltipContent
-                            className="w-[150px]"
-                            title={data.name || ""}
-                            content={
-                              <div className="flex items-center justify-between">
-                                <span>Delegates:</span>
-                                <span className="font-medium">{data.value || 0}</span>
-                              </div>
-                            }
-                          />
-                        )
-                      }
-                      return null
-                    }}
-                  />
+                  <Tooltip content={<CustomTooltip />} />
                 </PieChart>
               </ResponsiveContainer>
             </ChartContainer>

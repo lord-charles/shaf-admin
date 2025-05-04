@@ -49,6 +49,9 @@ export function DelegateStatsChart() {
   // Select data based on timeframe
   const data = timeframe === "monthly" ? monthlyData : timeframe === "weekly" ? weeklyData : quarterlyData
 
+  // Defensive: ensure data is always array
+  const safeData = Array.isArray(data) ? data : [];
+
   // X-axis key based on timeframe
   const xAxisKey = timeframe === "monthly" ? "month" : timeframe === "weekly" ? "week" : "quarter"
 
@@ -98,7 +101,7 @@ export function DelegateStatsChart() {
         <ChartContainer config={{}} className="aspect-[4/2] w-full">
           <ResponsiveContainer width="100%" height="100%">
             <AreaChart
-              data={data}
+              data={safeData}
               margin={{
                 top: 20,
                 right: 30,

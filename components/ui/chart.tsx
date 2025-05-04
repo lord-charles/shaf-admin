@@ -112,6 +112,7 @@ const ChartTooltipContent = React.forwardRef<
     indicator?: "line" | "dot" | "dashed"
     nameKey?: string
     labelKey?: string
+    content?: React.ReactNode
   }
 >(
   (
@@ -129,6 +130,7 @@ const ChartTooltipContent = React.forwardRef<
       color,
       nameKey,
       labelKey,
+      content,
     },
     ref
   ) => {
@@ -251,6 +253,7 @@ const ChartTooltipContent = React.forwardRef<
             )
           })}
         </div>
+        {content}
       </div>
     )
   }
